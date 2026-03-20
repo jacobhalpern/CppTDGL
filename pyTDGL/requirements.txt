@@ -1,0 +1,14 @@
+cloudpickle
+h5py
+joblib
+jupyter
+matplotlib
+meshpy
+numba
+numpy
+pint
+pytest
+pytest-cov
+scipy
+shapely
+tqdm
