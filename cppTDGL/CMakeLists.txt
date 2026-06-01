@@ -66,3 +66,17 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX "Header Files" FILES 
 # ----------------------------------------------------------------------
 
 enable_testing()
+
+add_executable(CoreModelSmokeTest
+    "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/CoreModelSmokeTest.cpp"
+)
+
+target_link_libraries(CoreModelSmokeTest
+    PRIVATE
+        CppTDGL::cppTDGL
+)
+
+add_test(
+    NAME CoreModelSmokeTest
+    COMMAND CoreModelSmokeTest
+)
