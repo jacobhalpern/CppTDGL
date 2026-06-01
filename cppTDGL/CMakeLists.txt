@@ -95,6 +95,20 @@ add_test(
     COMMAND MeshSmokeTest
 )
 
+add_executable(MeshOperatorsSmokeTest
+    "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/MeshOperatorsSmokeTest.cpp"
+)
+
+target_link_libraries(MeshOperatorsSmokeTest
+    PRIVATE
+        CppTDGL::cppTDGL
+)
+
+add_test(
+    NAME MeshOperatorsSmokeTest
+    COMMAND MeshOperatorsSmokeTest
+)
+
 add_executable(ProjectSerializerSmokeTest
     "${CMAKE_CURRENT_SOURCE_DIR}/tests/io_tests/ProjectSerializerSmokeTest.cpp"
 )
