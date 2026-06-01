@@ -109,6 +109,20 @@ add_test(
     COMMAND MeshOperatorsSmokeTest
 )
 
+add_executable(SparseMatrixSmokeTest
+    "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/SparseMatrixSmokeTest.cpp"
+)
+
+target_link_libraries(SparseMatrixSmokeTest
+    PRIVATE
+        CppTDGL::cppTDGL
+)
+
+add_test(
+    NAME SparseMatrixSmokeTest
+    COMMAND SparseMatrixSmokeTest
+)
+
 add_executable(ProjectSerializerSmokeTest
     "${CMAKE_CURRENT_SOURCE_DIR}/tests/io_tests/ProjectSerializerSmokeTest.cpp"
 )
