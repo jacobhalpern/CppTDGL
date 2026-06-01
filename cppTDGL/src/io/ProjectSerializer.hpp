@@ -1,15 +1,15 @@
 ﻿#pragma once
 
-#include <string>
+#include "Device.hpp"
+
+#include <filesystem>
 
 namespace cppTDGL {
 
 class ProjectSerializer {
 public:
-    ProjectSerializer() = default;
-    virtual ~ProjectSerializer() = default;
-
-    [[nodiscard]] std::string className() const;
+    static void save(const Device& device, const std::filesystem::path& path);
+    [[nodiscard]] static Device load(const std::filesystem::path& path);
 };
 
 } // namespace cppTDGL
