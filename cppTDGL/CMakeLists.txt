@@ -80,3 +80,17 @@ add_test(
     NAME CoreModelSmokeTest
     COMMAND CoreModelSmokeTest
 )
+
+add_executable(ProjectSerializerSmokeTest
+    "${CMAKE_CURRENT_SOURCE_DIR}/tests/io_tests/ProjectSerializerSmokeTest.cpp"
+)
+
+target_link_libraries(ProjectSerializerSmokeTest
+    PRIVATE
+        CppTDGL::cppTDGL
+)
+
+add_test(
+    NAME ProjectSerializerSmokeTest
+    COMMAND ProjectSerializerSmokeTest
+)
