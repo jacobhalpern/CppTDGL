@@ -68,3 +68,6 @@ cppTDGL/CMakeSettings.json
 Thumbs.db
 .vscode/
 .idea/
+
+# Ignore Visual Studio/Copilot-generated nested GitHub metadata
+cppTDGL/.github/
