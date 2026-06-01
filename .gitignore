@@ -1,41 +1,70 @@
-# Prerequisites
-*.d
+﻿# ----------------------------------------------------------------------
+# Local launchers / shortcuts
+# ----------------------------------------------------------------------
+Open_CppTDGL_VS.cmd
+*.lnk
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
+# ----------------------------------------------------------------------
+# CMake build outputs
+# ----------------------------------------------------------------------
+build/
+cppTDGL/build/
+out/
+cmake-build-*/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+DartConfiguration.tcl
+
+# ----------------------------------------------------------------------
+# Visual Studio local state
+# ----------------------------------------------------------------------
+.vs/
+cppTDGL/.vs/
+*.user
+*.suo
+*.VC.db
+*.VC.VC.opendb
+*.opensdf
+*.sdf
+*.ipch
+
+# ----------------------------------------------------------------------
+# Visual Studio CMake user-local settings
+# ----------------------------------------------------------------------
+CMakeUserPresets.json
+CMakeSettings.json
+cppTDGL/CMakeUserPresets.json
+cppTDGL/CMakeSettings.json
+
+# ----------------------------------------------------------------------
+# Visual Studio generated solution/project files
+# ----------------------------------------------------------------------
+*.sln
+*.slnx
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+
+# ----------------------------------------------------------------------
+# Compiled binaries
+# ----------------------------------------------------------------------
 *.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Linker files
-*.ilk
-
-# Debugger Files
-*.pdb
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
 *.lib
-
-# Executables
+*.dll
 *.exe
-*.out
-*.app
+*.pdb
+*.ilk
+*.exp
 
-# debug information files
-*.dwo
+# ----------------------------------------------------------------------
+# Logs and OS/editor noise
+# ----------------------------------------------------------------------
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
