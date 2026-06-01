@@ -1,30 +1,52 @@
 <#
-Setup_pyTDGL.ps1
+Setup_pyTDGL_v2.ps1
 
 Purpose:
   Set up the pyTDGL Python project on Windows and create one simple runner.
+
+Why v2 exists:
+  The original setup used a project-local virtual environment:
+    <project>\.venv
+
+  On Windows, JupyterLab / ipywidgets can install very long filenames under
+  share\jupyter\labextensions. In this project path, one of those paths reaches
+  the legacy 260-character Windows MAX_PATH boundary and pip can fail with:
+    ERROR: Could not install packages due to an OSError: [Errno 2] No such file or directory
+
+  This version uses a shorter external virtual environment path by default:
+    %USERPROFILE%\.venvs\pyTDGL
 
 Recommended use:
   1. Save this file into the pyTDGL project folder.
   2. Open PowerShell.
   3. Run:
-       powershell -ExecutionPolicy Bypass -File .\Setup_pyTDGL.ps1
+       powershell -ExecutionPolicy Bypass -File .\Setup_pyTDGL_v2.ps1
   4. After setup, run:
        .\Run_pyTDGL.cmd
 
-If the script is not inside the project folder, run:
-  powershell -ExecutionPolicy Bypass -File .\Setup_pyTDGL.ps1 -ProjectRoot "C:\Users\Jacob Halpern\Documents\GitHub\CppTDGL\pyTDGL"
+Useful options:
+  Recreate the external environment:
+       powershell -ExecutionPolicy Bypass -File .\Setup_pyTDGL_v2.ps1 -RecreateVenv
+
+  Use an even shorter environment path:
+       powershell -ExecutionPolicy Bypass -File .\Setup_pyTDGL_v2.ps1 -VenvDir "C:\.venvs\pyTDGL" -RecreateVenv
+
+  Keep the old project-local .venv folder instead of removing it:
+       powershell -ExecutionPolicy Bypass -File .\Setup_pyTDGL_v2.ps1 -KeepProjectLocalVenv
 #>
 
 [CmdletBinding()]
 param(
     [string]$ProjectRoot = "",
 
+    [string]$VenvDir = "",
+
     [ValidateSet("standard", "dev", "devdocs")]
     [string]$InstallProfile = "standard",
 
     [switch]$RecreateVenv,
-    [switch]$RunTests
+    [switch]$RunTests,
+    [switch]$KeepProjectLocalVenv
 )
 
 Set-StrictMode -Version Latest
@@ -97,8 +119,23 @@ Expected a folder containing both:
   - tdgl\
 
 Run this script from the project root, or pass the project path explicitly:
-  powershell -ExecutionPolicy Bypass -File .\Setup_pyTDGL.ps1 -ProjectRoot "C:\Users\Jacob Halpern\Documents\GitHub\CppTDGL\pyTDGL"
+  powershell -ExecutionPolicy Bypass -File .\Setup_pyTDGL_v2.ps1 -ProjectRoot "C:\Users\Jacob Halpern\Documents\GitHub\CppTDGL\pyTDGL"
 "@
+}
+
+function Resolve-VenvDirectory {
+    param(
+        [string]$ExplicitVenvDir,
+        [string]$ResolvedProjectRoot
+    )
+
+    if (-not [string]::IsNullOrWhiteSpace($ExplicitVenvDir)) {
+        return [System.IO.Path]::GetFullPath($ExplicitVenvDir)
+    }
+
+    # Keep this outside the project tree to avoid Windows path-length problems during JupyterLab install.
+    $default = Join-Path $env:USERPROFILE ".venvs\pyTDGL"
+    return [System.IO.Path]::GetFullPath($default)
 }
 
 function Find-CompatiblePython {
@@ -158,10 +195,41 @@ function Invoke-PythonLauncherChecked {
     Invoke-Checked -FilePath $PythonInfo.Exe -Arguments $allArgs
 }
 
+function Test-PathLengthWarning {
+    param([string]$VenvRoot)
+
+    $knownLongJupyterAsset = Join-Path $VenvRoot "share\jupyter\labextensions\@jupyter-widgets\jupyterlab-manager\static\vendors-node_modules_d3-color_src_color_js-node_modules_d3-format_src_defaultLocale_js-node_m-09b215.2643c43f22ad111f4f82.js.map"
+    $length = $knownLongJupyterAsset.Length
+
+    Write-Host "Projected long Jupyter asset path length: $length" -ForegroundColor DarkGray
+    Write-Host "Projected long Jupyter asset path: $knownLongJupyterAsset" -ForegroundColor DarkGray
+
+    if ($length -ge 250) {
+        Write-Host "WARNING: The selected venv path is still close to the Windows 260-character path limit." -ForegroundColor Yellow
+        Write-Host "Recommended shorter option: -VenvDir \"C:\.venvs\pyTDGL\"" -ForegroundColor Yellow
+    }
+}
+
 Write-Section "Resolving pyTDGL project folder"
 $ResolvedProjectRoot = Resolve-ProjectRoot -ExplicitProjectRoot $ProjectRoot
 Write-Host "Project root: $ResolvedProjectRoot" -ForegroundColor Green
 Set-Location -LiteralPath $ResolvedProjectRoot
+
+Write-Section "Resolving virtual environment location"
+$ResolvedVenvDir = Resolve-VenvDirectory -ExplicitVenvDir $VenvDir -ResolvedProjectRoot $ResolvedProjectRoot
+$VenvPython = Join-Path $ResolvedVenvDir "Scripts\python.exe"
+Write-Host "Virtual environment: $ResolvedVenvDir" -ForegroundColor Green
+Test-PathLengthWarning -VenvRoot $ResolvedVenvDir
+
+$ProjectLocalVenv = Join-Path $ResolvedProjectRoot ".venv"
+if ((Test-Path -LiteralPath $ProjectLocalVenv -PathType Container) -and (-not $KeepProjectLocalVenv)) {
+    Write-Host "Removing old project-local virtual environment to avoid confusion:" -ForegroundColor Yellow
+    Write-Host "  $ProjectLocalVenv" -ForegroundColor Yellow
+    Remove-Item -LiteralPath $ProjectLocalVenv -Recurse -Force
+}
+elseif (Test-Path -LiteralPath $ProjectLocalVenv -PathType Container) {
+    Write-Host "Keeping existing project-local .venv because -KeepProjectLocalVenv was specified." -ForegroundColor Yellow
+}
 
 Write-Section "Checking Python"
 $PythonInfo = Find-CompatiblePython
@@ -170,33 +238,46 @@ Write-Host "Python executable: $($PythonInfo.ExecutablePath)" -ForegroundColor G
 Write-Host "Python version: $($PythonInfo.Version)" -ForegroundColor Green
 
 Write-Section "Creating or reusing virtual environment"
-$VenvDir = Join-Path $ResolvedProjectRoot ".venv"
-$VenvPython = Join-Path $VenvDir "Scripts\python.exe"
+if ($RecreateVenv -and (Test-Path -LiteralPath $ResolvedVenvDir)) {
+    Write-Host "Removing existing virtual environment: $ResolvedVenvDir" -ForegroundColor Yellow
+    Remove-Item -LiteralPath $ResolvedVenvDir -Recurse -Force
+}
 
-if ($RecreateVenv -and (Test-Path -LiteralPath $VenvDir)) {
-    Write-Host "Removing existing virtual environment: $VenvDir" -ForegroundColor Yellow
-    Remove-Item -LiteralPath $VenvDir -Recurse -Force
+if (-not (Test-Path -LiteralPath $ResolvedVenvDir -PathType Container)) {
+    New-Item -ItemType Directory -Path $ResolvedVenvDir -Force | Out-Null
 }
 
 if (-not (Test-Path -LiteralPath $VenvPython -PathType Leaf)) {
-    Invoke-PythonLauncherChecked -PythonInfo $PythonInfo -Arguments @("-m", "venv", $VenvDir)
+    Invoke-PythonLauncherChecked -PythonInfo $PythonInfo -Arguments @("-m", "venv", $ResolvedVenvDir)
 }
 else {
-    Write-Host "Virtual environment already exists: $VenvDir" -ForegroundColor Green
+    Write-Host "Virtual environment already exists: $ResolvedVenvDir" -ForegroundColor Green
 }
 
+Write-Section "Preparing short pip temp/cache paths"
+$ShortWorkRoot = Join-Path $env:USERPROFILE ".venvs\_pyTDGL_work"
+$ShortTemp = Join-Path $ShortWorkRoot "tmp"
+$ShortCache = Join-Path $ShortWorkRoot "pip-cache"
+New-Item -ItemType Directory -Path $ShortTemp -Force | Out-Null
+New-Item -ItemType Directory -Path $ShortCache -Force | Out-Null
+$env:TEMP = $ShortTemp
+$env:TMP = $ShortTemp
+$env:PIP_CACHE_DIR = $ShortCache
+Write-Host "TEMP/TMP: $ShortTemp" -ForegroundColor Green
+Write-Host "PIP_CACHE_DIR: $ShortCache" -ForegroundColor Green
+
 Write-Section "Upgrading package tooling"
-Invoke-Checked -FilePath $VenvPython -Arguments @("-m", "pip", "install", "--upgrade", "pip", "setuptools", "wheel")
+Invoke-Checked -FilePath $VenvPython -Arguments @("-m", "pip", "install", "--upgrade", "--disable-pip-version-check", "pip", "setuptools", "wheel")
 
 Write-Section "Installing pyTDGL"
 if ($InstallProfile -eq "standard") {
-    Invoke-Checked -FilePath $VenvPython -Arguments @("-m", "pip", "install", "-e", ".")
+    Invoke-Checked -FilePath $VenvPython -Arguments @("-m", "pip", "install", "--disable-pip-version-check", "-e", ".")
 }
 elseif ($InstallProfile -eq "dev") {
-    Invoke-Checked -FilePath $VenvPython -Arguments @("-m", "pip", "install", "-e", ".[dev]")
+    Invoke-Checked -FilePath $VenvPython -Arguments @("-m", "pip", "install", "--disable-pip-version-check", "-e", ".[dev]")
 }
 elseif ($InstallProfile -eq "devdocs") {
-    Invoke-Checked -FilePath $VenvPython -Arguments @("-m", "pip", "install", "-e", ".[dev,docs]")
+    Invoke-Checked -FilePath $VenvPython -Arguments @("-m", "pip", "install", "--disable-pip-version-check", "-e", ".[dev,docs]")
 }
 
 Write-Section "Verifying tdgl import"
@@ -220,36 +301,37 @@ if ($RunTests) {
 Write-Section "Creating one-command runner"
 $RunPs1Path = Join-Path $ResolvedProjectRoot "Run_pyTDGL.ps1"
 $RunCmdPath = Join-Path $ResolvedProjectRoot "Run_pyTDGL.cmd"
+$VenvPythonForRunner = $VenvPython
 
-$runPs1 = @'
+$runPs1 = @"
 [CmdletBinding()]
 param()
 
 Set-StrictMode -Version Latest
-$ErrorActionPreference = "Stop"
+`$ErrorActionPreference = "Stop"
 
-$ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-$VenvPython = Join-Path $ProjectRoot ".venv\Scripts\python.exe"
-$QuickstartNotebook = Join-Path $ProjectRoot "docs\notebooks\quickstart.ipynb"
+`$ProjectRoot = Split-Path -Parent `$MyInvocation.MyCommand.Path
+`$VenvPython = "$VenvPythonForRunner"
+`$QuickstartNotebook = Join-Path `$ProjectRoot "docs\notebooks\quickstart.ipynb"
 
-if (-not (Test-Path -LiteralPath $VenvPython -PathType Leaf)) {
-    throw "Virtual environment not found. Run Setup_pyTDGL.ps1 first. Missing: $VenvPython"
+if (-not (Test-Path -LiteralPath `$VenvPython -PathType Leaf)) {
+    throw "Virtual environment not found. Run Setup_pyTDGL_v2.ps1 first. Missing: `$VenvPython"
 }
 
-Set-Location -LiteralPath $ProjectRoot
+Set-Location -LiteralPath `$ProjectRoot
 
-if (Test-Path -LiteralPath $QuickstartNotebook -PathType Leaf) {
+if (Test-Path -LiteralPath `$QuickstartNotebook -PathType Leaf) {
     Write-Host "Opening pyTDGL quickstart notebook..." -ForegroundColor Cyan
-    Write-Host "Notebook: $QuickstartNotebook" -ForegroundColor DarkGray
-    & $VenvPython -m jupyter notebook $QuickstartNotebook
-    exit $LASTEXITCODE
+    Write-Host "Notebook: `$QuickstartNotebook" -ForegroundColor DarkGray
+    & `$VenvPython -m jupyter notebook `$QuickstartNotebook
+    exit `$LASTEXITCODE
 }
 else {
     Write-Host "Quickstart notebook not found. Showing tdgl.visualize help instead." -ForegroundColor Yellow
-    & $VenvPython -m tdgl.visualize --help
-    exit $LASTEXITCODE
+    & `$VenvPython -m tdgl.visualize --help
+    exit `$LASTEXITCODE
 }
-'@
+"@
 
 $runCmd = @'
 @echo off
@@ -271,7 +353,7 @@ Write-Host "Created: $RunPs1Path" -ForegroundColor Green
 Write-Host "Created: $RunCmdPath" -ForegroundColor Green
 
 Write-Section "Setup complete"
-Write-Host "To run pyTDGL after setup, use one command from the project folder:" -ForegroundColor Green
+Write-Host "To run pyTDGL after setup, use this one command from the project folder:" -ForegroundColor Green
 Write-Host "  .\Run_pyTDGL.cmd" -ForegroundColor White
 Write-Host ""
 Write-Host "Or double-click this file:" -ForegroundColor Green
