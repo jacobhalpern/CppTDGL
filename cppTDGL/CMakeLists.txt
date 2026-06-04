@@ -74,6 +74,10 @@ add_executable(FiniteVolumeSparseOperatorsSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}
 target_link_libraries(FiniteVolumeSparseOperatorsSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME FiniteVolumeSparseOperatorsSmokeTest COMMAND FiniteVolumeSparseOperatorsSmokeTest)
 
+add_executable(MeshSerializerSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/io_tests/MeshSerializerSmokeTest.cpp")
+target_link_libraries(MeshSerializerSmokeTest PRIVATE CppTDGL::cppTDGL)
+add_test(NAME MeshSerializerSmokeTest COMMAND MeshSerializerSmokeTest)
+
 add_executable(ProjectSerializerSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/io_tests/ProjectSerializerSmokeTest.cpp")
 target_link_libraries(ProjectSerializerSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME ProjectSerializerSmokeTest COMMAND ProjectSerializerSmokeTest)
