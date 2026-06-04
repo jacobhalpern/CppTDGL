@@ -137,18 +137,12 @@ std::vector<std::vector<std::size_t>> MeshOperators::vertexToEdgeAdjacency(
     const EdgeMesh& edgeMesh,
     std::size_t vertexCount
 ) {
-    if (!edgeMesh.isValid()) {
-        throw std::invalid_argument("Cannot compute vertex-to-edge adjacency from an invalid EdgeMesh.");
-    }
+    validateEdgeMeshOrThrow(edgeMesh, vertexCount);
 
     std::vector<std::vector<std::size_t>> adjacency(vertexCount);
 
     for (std::size_t edgeIndex = 0; edgeIndex < edgeMesh.edgeCount(); ++edgeIndex) {
         const MeshEdge& edge = edgeMesh.edges()[edgeIndex];
-
-        if (edge.a >= vertexCount || edge.b >= vertexCount) {
-            throw std::invalid_argument("EdgeMesh contains a vertex index outside the requested vertex count.");
-        }
 
         adjacency[edge.a].push_back(edgeIndex);
         adjacency[edge.b].push_back(edgeIndex);
@@ -167,6 +161,67 @@ bool MeshOperators::finiteVolumeAreasAreConsistent(
     return std::abs(sum(controlVolumes) - mesh.totalArea()) <= tolerance;
 }
 
+SparseMatrix MeshOperators::edgeVertexIncidenceMatrix(
+    const EdgeMesh& edgeMesh,
+    std::size_t vertexCount
+) {
+    validateEdgeMeshOrThrow(edgeMesh, vertexCount);
+
+    SparseMatrix incidence(edgeMesh.edgeCount(), vertexCount);
+
+    for (std::size_t edgeIndex = 0; edgeIndex < edgeMesh.edgeCount(); ++edgeIndex) {
+        const MeshEdge& edge = edgeMesh.edges()[edgeIndex];
+
+        incidence.addEntry(edgeIndex, edge.a, -1.0);
+        incidence.addEntry(edgeIndex, edge.b, 1.0);
+    }
+
+    return incidence;
+}
+
+SparseMatrix MeshOperators::graphGradientOperator(
+    const EdgeMesh& edgeMesh,
+    std::size_t vertexCount
+) {
+    return edgeVertexIncidenceMatrix(edgeMesh, vertexCount);
+}
+
+SparseMatrix MeshOperators::graphDivergenceOperator(
+    const EdgeMesh& edgeMesh,
+    std::size_t vertexCount
+) {
+    validateEdgeMeshOrThrow(edgeMesh, vertexCount);
+
+    SparseMatrix divergence(vertexCount, edgeMesh.edgeCount());
+
+    for (std::size_t edgeIndex = 0; edgeIndex < edgeMesh.edgeCount(); ++edgeIndex) {
+        const MeshEdge& edge = edgeMesh.edges()[edgeIndex];
+
+        divergence.addEntry(edge.a, edgeIndex, 1.0);
+        divergence.addEntry(edge.b, edgeIndex, -1.0);
+    }
+
+    return divergence;
+}
+
+SparseMatrix MeshOperators::graphLaplacianOperator(
+    const EdgeMesh& edgeMesh,
+    std::size_t vertexCount
+) {
+    validateEdgeMeshOrThrow(edgeMesh, vertexCount);
+
+    SparseMatrix laplacian(vertexCount, vertexCount);
+
+    for (const MeshEdge& edge : edgeMesh.edges()) {
+        laplacian.addEntry(edge.a, edge.a, 1.0);
+        laplacian.addEntry(edge.b, edge.b, 1.0);
+        laplacian.addEntry(edge.a, edge.b, -1.0);
+        laplacian.addEntry(edge.b, edge.a, -1.0);
+    }
+
+    return laplacian;
+}
+
 double MeshOperators::sum(const std::vector<double>& values) noexcept {
     return std::accumulate(values.begin(), values.end(), 0.0);
 }
@@ -176,6 +231,25 @@ void MeshOperators::validateMeshOrThrow(const Mesh& mesh) {
 
     if (!errors.empty()) {
         throw std::invalid_argument("Cannot build mesh operators from an invalid Mesh.");
+    }
+}
+
+void MeshOperators::validateEdgeMeshOrThrow(
+    const EdgeMesh& edgeMesh,
+    std::size_t vertexCount
+) {
+    if (!edgeMesh.isValid()) {
+        throw std::invalid_argument("Cannot build sparse mesh operators from an invalid EdgeMesh.");
+    }
+
+    if (vertexCount == 0) {
+        throw std::invalid_argument("Sparse mesh operators require at least one vertex.");
+    }
+
+    for (const MeshEdge& edge : edgeMesh.edges()) {
+        if (edge.a >= vertexCount || edge.b >= vertexCount) {
+            throw std::invalid_argument("EdgeMesh contains a vertex index outside the requested vertex count.");
+        }
     }
 }
 

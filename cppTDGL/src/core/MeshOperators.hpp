@@ -2,6 +2,7 @@
 
 #include "EdgeMesh.hpp"
 #include "Mesh.hpp"
+#include "SparseMatrix.hpp"
 
 #include <cstddef>
 #include <vector>
@@ -41,10 +42,31 @@ public:
         double tolerance = 1.0e-10
     );
 
+    [[nodiscard]] static SparseMatrix edgeVertexIncidenceMatrix(
+        const EdgeMesh& edgeMesh,
+        std::size_t vertexCount
+    );
+
+    [[nodiscard]] static SparseMatrix graphGradientOperator(
+        const EdgeMesh& edgeMesh,
+        std::size_t vertexCount
+    );
+
+    [[nodiscard]] static SparseMatrix graphDivergenceOperator(
+        const EdgeMesh& edgeMesh,
+        std::size_t vertexCount
+    );
+
+    [[nodiscard]] static SparseMatrix graphLaplacianOperator(
+        const EdgeMesh& edgeMesh,
+        std::size_t vertexCount
+    );
+
     [[nodiscard]] static double sum(const std::vector<double>& values) noexcept;
 
 private:
     static void validateMeshOrThrow(const Mesh& mesh);
+    static void validateEdgeMeshOrThrow(const EdgeMesh& edgeMesh, std::size_t vertexCount);
 };
 
 } // namespace cppTDGL
