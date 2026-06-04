@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "EdgeMesh.hpp"
 #include "Mesh.hpp"
@@ -21,7 +21,6 @@ struct EdgeTriangleAdjacency {
 class MeshOperators {
 public:
     [[nodiscard]] static std::vector<Point2D> triangleCentroids(const Mesh& mesh);
-
     [[nodiscard]] static std::vector<double> vertexControlVolumes(const Mesh& mesh);
 
     [[nodiscard]] static std::vector<std::vector<std::size_t>> vertexToTriangleAdjacency(
@@ -62,11 +61,27 @@ public:
         std::size_t vertexCount
     );
 
+    [[nodiscard]] static SparseMatrix finiteVolumeGradientOperator(
+        const EdgeMesh& edgeMesh,
+        std::size_t vertexCount
+    );
+
+    [[nodiscard]] static SparseMatrix finiteVolumeDivergenceOperator(
+        const EdgeMesh& edgeMesh,
+        const std::vector<double>& controlVolumes,
+        std::size_t vertexCount
+    );
+
     [[nodiscard]] static double sum(const std::vector<double>& values) noexcept;
 
 private:
     static void validateMeshOrThrow(const Mesh& mesh);
     static void validateEdgeMeshOrThrow(const EdgeMesh& edgeMesh, std::size_t vertexCount);
+
+    static void validateControlVolumesOrThrow(
+        const std::vector<double>& controlVolumes,
+        std::size_t vertexCount
+    );
 };
 
 } // namespace cppTDGL

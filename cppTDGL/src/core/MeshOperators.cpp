@@ -1,4 +1,4 @@
-﻿#include "MeshOperators.hpp"
+#include "MeshOperators.hpp"
 
 #include <cmath>
 #include <map>
@@ -222,6 +222,44 @@ SparseMatrix MeshOperators::graphLaplacianOperator(
     return laplacian;
 }
 
+SparseMatrix MeshOperators::finiteVolumeGradientOperator(
+    const EdgeMesh& edgeMesh,
+    std::size_t vertexCount
+) {
+    validateEdgeMeshOrThrow(edgeMesh, vertexCount);
+
+    SparseMatrix gradient(edgeMesh.edgeCount(), vertexCount);
+
+    for (std::size_t edgeIndex = 0; edgeIndex < edgeMesh.edgeCount(); ++edgeIndex) {
+        const MeshEdge& edge = edgeMesh.edges()[edgeIndex];
+
+        gradient.addEntry(edgeIndex, edge.a, -1.0 / edge.length);
+        gradient.addEntry(edgeIndex, edge.b, 1.0 / edge.length);
+    }
+
+    return gradient;
+}
+
+SparseMatrix MeshOperators::finiteVolumeDivergenceOperator(
+    const EdgeMesh& edgeMesh,
+    const std::vector<double>& controlVolumes,
+    std::size_t vertexCount
+) {
+    validateEdgeMeshOrThrow(edgeMesh, vertexCount);
+    validateControlVolumesOrThrow(controlVolumes, vertexCount);
+
+    SparseMatrix divergence(vertexCount, edgeMesh.edgeCount());
+
+    for (std::size_t edgeIndex = 0; edgeIndex < edgeMesh.edgeCount(); ++edgeIndex) {
+        const MeshEdge& edge = edgeMesh.edges()[edgeIndex];
+
+        divergence.addEntry(edge.a, edgeIndex, -1.0 / controlVolumes[edge.a]);
+        divergence.addEntry(edge.b, edgeIndex, 1.0 / controlVolumes[edge.b]);
+    }
+
+    return divergence;
+}
+
 double MeshOperators::sum(const std::vector<double>& values) noexcept {
     return std::accumulate(values.begin(), values.end(), 0.0);
 }
@@ -249,6 +287,21 @@ void MeshOperators::validateEdgeMeshOrThrow(
     for (const MeshEdge& edge : edgeMesh.edges()) {
         if (edge.a >= vertexCount || edge.b >= vertexCount) {
             throw std::invalid_argument("EdgeMesh contains a vertex index outside the requested vertex count.");
+        }
+    }
+}
+
+void MeshOperators::validateControlVolumesOrThrow(
+    const std::vector<double>& controlVolumes,
+    std::size_t vertexCount
+) {
+    if (controlVolumes.size() != vertexCount) {
+        throw std::invalid_argument("Control-volume array size must equal vertex count.");
+    }
+
+    for (std::size_t i = 0; i < controlVolumes.size(); ++i) {
+        if (controlVolumes[i] <= 0.0) {
+            throw std::invalid_argument("Control volume " + std::to_string(i) + " must be positive.");
         }
     }
 }

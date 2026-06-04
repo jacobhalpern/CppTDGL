@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.24)
 
 project(CppTDGL
     VERSION 0.1.0
@@ -6,20 +6,11 @@ project(CppTDGL
     LANGUAGES CXX
 )
 
-# ----------------------------------------------------------------------
-# Global C++ configuration
-# ----------------------------------------------------------------------
-
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Make Visual Studio solution folders cleaner.
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
-# ----------------------------------------------------------------------
-# Source discovery
-# ----------------------------------------------------------------------
 
 file(GLOB_RECURSE CPPTDGL_SOURCES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
@@ -28,10 +19,6 @@ file(GLOB_RECURSE CPPTDGL_SOURCES CONFIGURE_DEPENDS
 file(GLOB_RECURSE CPPTDGL_HEADERS CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp"
 )
-
-# ----------------------------------------------------------------------
-# Core library target
-# ----------------------------------------------------------------------
 
 add_library(cppTDGL STATIC
     ${CPPTDGL_SOURCES}
@@ -61,92 +48,32 @@ endif()
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX "Source Files" FILES ${CPPTDGL_SOURCES})
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX "Header Files" FILES ${CPPTDGL_HEADERS})
 
-# ----------------------------------------------------------------------
-# Tests
-# ----------------------------------------------------------------------
-
 enable_testing()
 
-add_executable(CoreModelSmokeTest
-    "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/CoreModelSmokeTest.cpp"
-)
+add_executable(CoreModelSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/CoreModelSmokeTest.cpp")
+target_link_libraries(CoreModelSmokeTest PRIVATE CppTDGL::cppTDGL)
+add_test(NAME CoreModelSmokeTest COMMAND CoreModelSmokeTest)
 
-target_link_libraries(CoreModelSmokeTest
-    PRIVATE
-        CppTDGL::cppTDGL
-)
+add_executable(MeshSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/MeshSmokeTest.cpp")
+target_link_libraries(MeshSmokeTest PRIVATE CppTDGL::cppTDGL)
+add_test(NAME MeshSmokeTest COMMAND MeshSmokeTest)
 
-add_test(
-    NAME CoreModelSmokeTest
-    COMMAND CoreModelSmokeTest
-)
+add_executable(MeshOperatorsSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/MeshOperatorsSmokeTest.cpp")
+target_link_libraries(MeshOperatorsSmokeTest PRIVATE CppTDGL::cppTDGL)
+add_test(NAME MeshOperatorsSmokeTest COMMAND MeshOperatorsSmokeTest)
 
-add_executable(MeshSmokeTest
-    "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/MeshSmokeTest.cpp"
-)
+add_executable(SparseMatrixSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/SparseMatrixSmokeTest.cpp")
+target_link_libraries(SparseMatrixSmokeTest PRIVATE CppTDGL::cppTDGL)
+add_test(NAME SparseMatrixSmokeTest COMMAND SparseMatrixSmokeTest)
 
-target_link_libraries(MeshSmokeTest
-    PRIVATE
-        CppTDGL::cppTDGL
-)
+add_executable(SparseMeshOperatorsSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/SparseMeshOperatorsSmokeTest.cpp")
+target_link_libraries(SparseMeshOperatorsSmokeTest PRIVATE CppTDGL::cppTDGL)
+add_test(NAME SparseMeshOperatorsSmokeTest COMMAND SparseMeshOperatorsSmokeTest)
 
-add_test(
-    NAME MeshSmokeTest
-    COMMAND MeshSmokeTest
-)
+add_executable(FiniteVolumeSparseOperatorsSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/FiniteVolumeSparseOperatorsSmokeTest.cpp")
+target_link_libraries(FiniteVolumeSparseOperatorsSmokeTest PRIVATE CppTDGL::cppTDGL)
+add_test(NAME FiniteVolumeSparseOperatorsSmokeTest COMMAND FiniteVolumeSparseOperatorsSmokeTest)
 
-add_executable(MeshOperatorsSmokeTest
-    "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/MeshOperatorsSmokeTest.cpp"
-)
-
-target_link_libraries(MeshOperatorsSmokeTest
-    PRIVATE
-        CppTDGL::cppTDGL
-)
-
-add_test(
-    NAME MeshOperatorsSmokeTest
-    COMMAND MeshOperatorsSmokeTest
-)
-
-add_executable(SparseMatrixSmokeTest
-    "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/SparseMatrixSmokeTest.cpp"
-)
-
-target_link_libraries(SparseMatrixSmokeTest
-    PRIVATE
-        CppTDGL::cppTDGL
-)
-
-add_test(
-    NAME SparseMatrixSmokeTest
-    COMMAND SparseMatrixSmokeTest
-)
-
-add_executable(SparseMeshOperatorsSmokeTest
-    "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/SparseMeshOperatorsSmokeTest.cpp"
-)
-
-target_link_libraries(SparseMeshOperatorsSmokeTest
-    PRIVATE
-        CppTDGL::cppTDGL
-)
-
-add_test(
-    NAME SparseMeshOperatorsSmokeTest
-    COMMAND SparseMeshOperatorsSmokeTest
-)
-
-add_executable(ProjectSerializerSmokeTest
-    "${CMAKE_CURRENT_SOURCE_DIR}/tests/io_tests/ProjectSerializerSmokeTest.cpp"
-)
-
-target_link_libraries(ProjectSerializerSmokeTest
-    PRIVATE
-        CppTDGL::cppTDGL
-)
-
-add_test(
-    NAME ProjectSerializerSmokeTest
-    COMMAND ProjectSerializerSmokeTest
-)
+add_executable(ProjectSerializerSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/io_tests/ProjectSerializerSmokeTest.cpp")
+target_link_libraries(ProjectSerializerSmokeTest PRIVATE CppTDGL::cppTDGL)
+add_test(NAME ProjectSerializerSmokeTest COMMAND ProjectSerializerSmokeTest)
