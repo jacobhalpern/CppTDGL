@@ -54,6 +54,10 @@ add_executable(CoreModelSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/
 target_link_libraries(CoreModelSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME CoreModelSmokeTest COMMAND CoreModelSmokeTest)
 
+add_executable(DeviceMeshIntegrationSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/DeviceMeshIntegrationSmokeTest.cpp")
+target_link_libraries(DeviceMeshIntegrationSmokeTest PRIVATE CppTDGL::cppTDGL)
+add_test(NAME DeviceMeshIntegrationSmokeTest COMMAND DeviceMeshIntegrationSmokeTest)
+
 add_executable(MeshSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/MeshSmokeTest.cpp")
 target_link_libraries(MeshSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME MeshSmokeTest COMMAND MeshSmokeTest)

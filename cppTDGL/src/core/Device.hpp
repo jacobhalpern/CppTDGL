@@ -1,9 +1,11 @@
-﻿#pragma once
+#pragma once
 
 #include "Layer.hpp"
+#include "Mesh.hpp"
 #include "Polygon2D.hpp"
 #include "SolverOptions.hpp"
 
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -37,6 +39,12 @@ public:
     void addTerminal(Polygon2D terminal);
     void addProbePoint(Point2D point);
 
+    [[nodiscard]] bool hasMesh() const noexcept;
+    [[nodiscard]] const Mesh& mesh() const;
+    [[nodiscard]] Mesh& mesh();
+    void setMesh(Mesh value);
+    void clearMesh();
+
     [[nodiscard]] bool hasValidGeometry() const;
     [[nodiscard]] bool isValid() const;
     [[nodiscard]] std::vector<std::string> validationErrors() const;
@@ -49,6 +57,7 @@ private:
     std::vector<Polygon2D> holes_;
     std::vector<Polygon2D> terminals_;
     std::vector<Point2D> probePoints_;
+    std::optional<Mesh> mesh_;
 };
 
 } // namespace cppTDGL

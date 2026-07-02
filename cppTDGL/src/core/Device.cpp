@@ -1,5 +1,6 @@
-﻿#include "Device.hpp"
+#include "Device.hpp"
 
+#include <stdexcept>
 #include <utility>
 
 namespace cppTDGL {
@@ -68,6 +69,34 @@ void Device::addProbePoint(Point2D point) {
     probePoints_.push_back(point);
 }
 
+bool Device::hasMesh() const noexcept {
+    return mesh_.has_value();
+}
+
+const Mesh& Device::mesh() const {
+    if (!mesh_.has_value()) {
+        throw std::logic_error("Device does not have an attached mesh.");
+    }
+
+    return *mesh_;
+}
+
+Mesh& Device::mesh() {
+    if (!mesh_.has_value()) {
+        throw std::logic_error("Device does not have an attached mesh.");
+    }
+
+    return *mesh_;
+}
+
+void Device::setMesh(Mesh value) {
+    mesh_ = std::move(value);
+}
+
+void Device::clearMesh() {
+    mesh_.reset();
+}
+
 bool Device::hasValidGeometry() const {
     if (!film_.isValid()) {
         return false;
@@ -83,6 +112,10 @@ bool Device::hasValidGeometry() const {
         if (!terminal.isValid()) {
             return false;
         }
+    }
+
+    if (mesh_.has_value() && !mesh_->isValid()) {
+        return false;
     }
 
     return true;
@@ -119,6 +152,10 @@ std::vector<std::string> Device::validationErrors() const {
         if (pointInsideAnyPolygon(point, holes_)) {
             errors.emplace_back("Probe point " + std::to_string(i) + " must not be inside a hole polygon.");
         }
+    }
+
+    if (mesh_.has_value()) {
+        appendErrors(errors, "Mesh: ", mesh_->validationErrors());
     }
 
     return errors;
