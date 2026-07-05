@@ -1,6 +1,7 @@
 #include "ProjectSerializer.hpp"
 
 #include "Mesh.hpp"
+#include "SerializationFormat.hpp"
 
 #include <fstream>
 #include <iomanip>
@@ -12,8 +13,6 @@
 
 namespace cppTDGL {
 namespace {
-
-constexpr int kProjectFileVersion = 2;
 
 [[nodiscard]] std::runtime_error parseError(const std::string& message) {
     return std::runtime_error("CppTDGL project parse error: " + message);
@@ -175,7 +174,7 @@ void ProjectSerializer::save(const Device& device, const std::filesystem::path& 
 
     output << std::setprecision(17);
 
-    output << "CPPTDGL_PROJECT_VERSION " << kProjectFileVersion << '\n';
+    output << SerializationFormat::projectFileSignature << ' ' << SerializationFormat::latestProjectFileVersion << '\n';
     output << "PROJECT_NAME " << std::quoted(device.projectName()) << '\n';
 
     const Layer& layer = device.layer();
@@ -234,14 +233,14 @@ Device ProjectSerializer::load(const std::filesystem::path& path) {
         throw std::runtime_error("Failed to open project file for reading: " + path.string());
     }
 
-    expectToken(input, "CPPTDGL_PROJECT_VERSION");
+    expectToken(input, std::string(SerializationFormat::projectFileSignature));
 
     int version = 0;
     if (!(input >> version)) {
         throw parseError("Failed to read project file version.");
     }
 
-    if (version != 1 && version != kProjectFileVersion) {
+    if (!SerializationFormat::isSupportedProjectFileVersion(version)) {
         throw parseError("Unsupported project file version: " + std::to_string(version) + ".");
     }
 
