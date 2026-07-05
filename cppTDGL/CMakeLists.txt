@@ -82,6 +82,10 @@ add_executable(MeshSerializerSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/io_tes
 target_link_libraries(MeshSerializerSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME MeshSerializerSmokeTest COMMAND MeshSerializerSmokeTest)
 
+add_executable(SerializationFormatSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/io_tests/SerializationFormatSmokeTest.cpp")
+target_link_libraries(SerializationFormatSmokeTest PRIVATE CppTDGL::cppTDGL)
+add_test(NAME SerializationFormatSmokeTest COMMAND SerializationFormatSmokeTest)
+
 add_executable(ProjectSerializerMeshIntegrationSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/io_tests/ProjectSerializerMeshIntegrationSmokeTest.cpp")
 target_link_libraries(ProjectSerializerMeshIntegrationSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME ProjectSerializerMeshIntegrationSmokeTest COMMAND ProjectSerializerMeshIntegrationSmokeTest)

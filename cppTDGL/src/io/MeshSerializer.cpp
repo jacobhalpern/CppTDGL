@@ -1,5 +1,7 @@
 #include "MeshSerializer.hpp"
 
+#include "SerializationFormat.hpp"
+
 #include <fstream>
 #include <iomanip>
 #include <stdexcept>
@@ -9,8 +11,6 @@
 
 namespace cppTDGL {
 namespace {
-
-constexpr int kMeshFileVersion = 1;
 
 [[nodiscard]] std::runtime_error parseError(const std::string& message) {
     return std::runtime_error("CppTDGL mesh parse error: " + message);
@@ -43,7 +43,7 @@ void MeshSerializer::save(const Mesh& mesh, const std::filesystem::path& path) {
 
     output << std::setprecision(17);
 
-    output << "CPPTDGL_MESH_VERSION " << kMeshFileVersion << '\n';
+    output << SerializationFormat::meshFileSignature << ' ' << SerializationFormat::latestMeshFileVersion << '\n';
 
     output << "VERTICES " << mesh.vertices().size() << '\n';
     for (const Point2D& point : mesh.vertices()) {
@@ -77,14 +77,14 @@ Mesh MeshSerializer::load(const std::filesystem::path& path) {
         throw std::runtime_error("Failed to open mesh file for reading: " + path.string());
     }
 
-    expectToken(input, "CPPTDGL_MESH_VERSION");
+    expectToken(input, std::string(SerializationFormat::meshFileSignature));
 
     int version = 0;
     if (!(input >> version)) {
         throw parseError("Failed to read mesh file version.");
     }
 
-    if (version != kMeshFileVersion) {
+    if (!SerializationFormat::isSupportedMeshFileVersion(version)) {
         throw parseError("Unsupported mesh file version: " + std::to_string(version) + ".");
     }
 
