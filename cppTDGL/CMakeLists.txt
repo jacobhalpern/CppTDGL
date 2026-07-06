@@ -62,6 +62,10 @@ add_executable(MeshSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/MeshS
 target_link_libraries(MeshSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME MeshSmokeTest COMMAND MeshSmokeTest)
 
+add_executable(MeshGeneratorSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/MeshGeneratorSmokeTest.cpp")
+target_link_libraries(MeshGeneratorSmokeTest PRIVATE CppTDGL::cppTDGL)
+add_test(NAME MeshGeneratorSmokeTest COMMAND MeshGeneratorSmokeTest)
+
 add_executable(MeshOperatorsSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/MeshOperatorsSmokeTest.cpp")
 target_link_libraries(MeshOperatorsSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME MeshOperatorsSmokeTest COMMAND MeshOperatorsSmokeTest)
