@@ -74,6 +74,10 @@ add_executable(SparseMatrixSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tes
 target_link_libraries(SparseMatrixSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME SparseMatrixSmokeTest COMMAND SparseMatrixSmokeTest)
 
+add_executable(SolverStateSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/SolverStateSmokeTest.cpp")
+target_link_libraries(SolverStateSmokeTest PRIVATE CppTDGL::cppTDGL)
+add_test(NAME SolverStateSmokeTest COMMAND SolverStateSmokeTest)
+
 add_executable(SparseMeshOperatorsSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/SparseMeshOperatorsSmokeTest.cpp")
 target_link_libraries(SparseMeshOperatorsSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME SparseMeshOperatorsSmokeTest COMMAND SparseMeshOperatorsSmokeTest)
