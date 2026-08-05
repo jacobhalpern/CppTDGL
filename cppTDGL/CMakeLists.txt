@@ -50,6 +50,9 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX "Header Files" FILES 
 
 enable_testing()
 
+add_executable(CppTDGLSmokeCli "${CMAKE_CURRENT_SOURCE_DIR}/apps/CppTDGLSmokeCli.cpp")
+target_link_libraries(CppTDGLSmokeCli PRIVATE CppTDGL::cppTDGL)
+
 add_executable(CoreModelSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/CoreModelSmokeTest.cpp")
 target_link_libraries(CoreModelSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME CoreModelSmokeTest COMMAND CoreModelSmokeTest)
@@ -105,6 +108,8 @@ add_test(NAME Hdf5SolutionPersistenceSmokeTest COMMAND Hdf5SolutionPersistenceSm
 add_executable(SimulationRunnerSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/simulation_tests/SimulationRunnerSmokeTest.cpp")
 target_link_libraries(SimulationRunnerSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME SimulationRunnerSmokeTest COMMAND SimulationRunnerSmokeTest)
+
+add_test(NAME CppTDGLSmokeCliTest COMMAND CppTDGLSmokeCli)
 
 add_executable(SerializationFormatSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/io_tests/SerializationFormatSmokeTest.cpp")
 target_link_libraries(SerializationFormatSmokeTest PRIVATE CppTDGL::cppTDGL)
