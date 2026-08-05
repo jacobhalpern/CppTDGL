@@ -1,5 +1,8 @@
-﻿#pragma once
+#pragma once
 
+#include "Solution.hpp"
+
+#include <filesystem>
 #include <string>
 
 namespace cppTDGL {
@@ -10,6 +13,8 @@ public:
     virtual ~Hdf5SolutionReader() = default;
 
     [[nodiscard]] std::string className() const;
+
+    [[nodiscard]] static Solution read(const std::filesystem::path& path);
 };
 
 } // namespace cppTDGL
