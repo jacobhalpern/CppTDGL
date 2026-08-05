@@ -102,6 +102,10 @@ add_executable(Hdf5SolutionPersistenceSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tes
 target_link_libraries(Hdf5SolutionPersistenceSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME Hdf5SolutionPersistenceSmokeTest COMMAND Hdf5SolutionPersistenceSmokeTest)
 
+add_executable(SimulationRunnerSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/simulation_tests/SimulationRunnerSmokeTest.cpp")
+target_link_libraries(SimulationRunnerSmokeTest PRIVATE CppTDGL::cppTDGL)
+add_test(NAME SimulationRunnerSmokeTest COMMAND SimulationRunnerSmokeTest)
+
 add_executable(SerializationFormatSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/io_tests/SerializationFormatSmokeTest.cpp")
 target_link_libraries(SerializationFormatSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME SerializationFormatSmokeTest COMMAND SerializationFormatSmokeTest)
