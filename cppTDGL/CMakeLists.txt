@@ -98,6 +98,10 @@ add_executable(MeshSerializerSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/io_tes
 target_link_libraries(MeshSerializerSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME MeshSerializerSmokeTest COMMAND MeshSerializerSmokeTest)
 
+add_executable(Hdf5SolutionPersistenceSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/io_tests/Hdf5SolutionPersistenceSmokeTest.cpp")
+target_link_libraries(Hdf5SolutionPersistenceSmokeTest PRIVATE CppTDGL::cppTDGL)
+add_test(NAME Hdf5SolutionPersistenceSmokeTest COMMAND Hdf5SolutionPersistenceSmokeTest)
+
 add_executable(SerializationFormatSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/io_tests/SerializationFormatSmokeTest.cpp")
 target_link_libraries(SerializationFormatSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME SerializationFormatSmokeTest COMMAND SerializationFormatSmokeTest)
