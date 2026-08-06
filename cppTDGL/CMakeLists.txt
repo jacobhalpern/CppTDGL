@@ -150,6 +150,10 @@ add_executable(MeshPreviewModelSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/ui_t
 target_link_libraries(MeshPreviewModelSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME MeshPreviewModelSmokeTest COMMAND MeshPreviewModelSmokeTest)
 
+add_executable(SolverSettingsModelSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/ui_tests/SolverSettingsModelSmokeTest.cpp")
+target_link_libraries(SolverSettingsModelSmokeTest PRIVATE CppTDGL::cppTDGL)
+add_test(NAME SolverSettingsModelSmokeTest COMMAND SolverSettingsModelSmokeTest)
+
 add_executable(SerializationFormatSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/io_tests/SerializationFormatSmokeTest.cpp")
 target_link_libraries(SerializationFormatSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME SerializationFormatSmokeTest COMMAND SerializationFormatSmokeTest)
