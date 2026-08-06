@@ -48,6 +48,29 @@ endif()
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX "Source Files" FILES ${CPPTDGL_SOURCES})
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX "Header Files" FILES ${CPPTDGL_HEADERS})
 
+option(CPPTDGL_ENABLE_QT "Build optional Qt Widgets application shell" OFF)
+
+if (CPPTDGL_ENABLE_QT)
+    find_package(Qt6 REQUIRED COMPONENTS Widgets)
+
+    add_executable(CppTDGLQtApp
+        "${CMAKE_CURRENT_SOURCE_DIR}/apps/CppTDGLQtApp.cpp"
+    )
+
+    target_link_libraries(CppTDGLQtApp
+        PRIVATE
+            CppTDGL::cppTDGL
+            Qt6::Widgets
+    )
+
+    target_compile_features(CppTDGLQtApp PRIVATE cxx_std_20)
+
+    set_target_properties(CppTDGLQtApp
+        PROPERTIES
+            WIN32_EXECUTABLE TRUE
+    )
+endif()
+
 enable_testing()
 
 add_executable(CppTDGLSmokeCli "${CMAKE_CURRENT_SOURCE_DIR}/apps/CppTDGLSmokeCli.cpp")
@@ -110,6 +133,10 @@ target_link_libraries(SimulationRunnerSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME SimulationRunnerSmokeTest COMMAND SimulationRunnerSmokeTest)
 
 add_test(NAME CppTDGLSmokeCliTest COMMAND CppTDGLSmokeCli)
+
+add_executable(ApplicationInfoSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/ui_tests/ApplicationInfoSmokeTest.cpp")
+target_link_libraries(ApplicationInfoSmokeTest PRIVATE CppTDGL::cppTDGL)
+add_test(NAME ApplicationInfoSmokeTest COMMAND ApplicationInfoSmokeTest)
 
 add_executable(SerializationFormatSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/io_tests/SerializationFormatSmokeTest.cpp")
 target_link_libraries(SerializationFormatSmokeTest PRIVATE CppTDGL::cppTDGL)
