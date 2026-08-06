@@ -138,6 +138,10 @@ add_executable(ApplicationInfoSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/ui_te
 target_link_libraries(ApplicationInfoSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME ApplicationInfoSmokeTest COMMAND ApplicationInfoSmokeTest)
 
+add_executable(ProjectWizardModelSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/ui_tests/ProjectWizardModelSmokeTest.cpp")
+target_link_libraries(ProjectWizardModelSmokeTest PRIVATE CppTDGL::cppTDGL)
+add_test(NAME ProjectWizardModelSmokeTest COMMAND ProjectWizardModelSmokeTest)
+
 add_executable(SerializationFormatSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/io_tests/SerializationFormatSmokeTest.cpp")
 target_link_libraries(SerializationFormatSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME SerializationFormatSmokeTest COMMAND SerializationFormatSmokeTest)
