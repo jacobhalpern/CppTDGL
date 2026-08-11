@@ -158,6 +158,10 @@ add_executable(SimulationExecutionModelSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/te
 target_link_libraries(SimulationExecutionModelSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME SimulationExecutionModelSmokeTest COMMAND SimulationExecutionModelSmokeTest)
 
+add_executable(ResultsDashboardModelSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/ui_tests/ResultsDashboardModelSmokeTest.cpp")
+target_link_libraries(ResultsDashboardModelSmokeTest PRIVATE CppTDGL::cppTDGL)
+add_test(NAME ResultsDashboardModelSmokeTest COMMAND ResultsDashboardModelSmokeTest)
+
 add_executable(SerializationFormatSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/io_tests/SerializationFormatSmokeTest.cpp")
 target_link_libraries(SerializationFormatSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME SerializationFormatSmokeTest COMMAND SerializationFormatSmokeTest)
