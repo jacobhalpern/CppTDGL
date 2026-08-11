@@ -39,6 +39,32 @@ target_include_directories(cppTDGL
 
 target_compile_features(cppTDGL PUBLIC cxx_std_20)
 
+# Optional dependency compile definitions. These gates let source code expose
+# dependency-aware behavior without making optional dependencies mandatory.
+if (CPPTDGL_ENABLE_QT)
+    target_compile_definitions(cppTDGL PUBLIC CPPTDGL_WITH_QT=1)
+else()
+    target_compile_definitions(cppTDGL PUBLIC CPPTDGL_WITH_QT=0)
+endif()
+
+if (CPPTDGL_ENABLE_EIGEN)
+    target_compile_definitions(cppTDGL PUBLIC CPPTDGL_WITH_EIGEN=1)
+else()
+    target_compile_definitions(cppTDGL PUBLIC CPPTDGL_WITH_EIGEN=0)
+endif()
+
+if (CPPTDGL_ENABLE_NATIVE_HDF5)
+    target_compile_definitions(cppTDGL PUBLIC CPPTDGL_WITH_NATIVE_HDF5=1)
+else()
+    target_compile_definitions(cppTDGL PUBLIC CPPTDGL_WITH_NATIVE_HDF5=0)
+endif()
+
+if (CPPTDGL_ENABLE_VTK)
+    target_compile_definitions(cppTDGL PUBLIC CPPTDGL_WITH_VTK=1)
+else()
+    target_compile_definitions(cppTDGL PUBLIC CPPTDGL_WITH_VTK=0)
+endif()
+
 if (MSVC)
     target_compile_options(cppTDGL PRIVATE /W4 /permissive-)
 else()
@@ -49,6 +75,9 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX "Source Files" FILES 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX "Header Files" FILES ${CPPTDGL_HEADERS})
 
 option(CPPTDGL_ENABLE_QT "Build optional Qt Widgets application shell" OFF)
+option(CPPTDGL_ENABLE_EIGEN "Enable optional Eigen integration hooks." OFF)
+option(CPPTDGL_ENABLE_NATIVE_HDF5 "Enable optional native HDF5 integration hooks." OFF)
+option(CPPTDGL_ENABLE_VTK "Enable optional VTK visualization integration hooks." OFF)
 
 if (CPPTDGL_ENABLE_QT)
     find_package(Qt6 REQUIRED COMPONENTS Widgets)
@@ -111,6 +140,10 @@ add_test(NAME TDGLSolverSmokeTest COMMAND TDGLSolverSmokeTest)
 add_executable(TDGLPhysicsSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/TDGLPhysicsSmokeTest.cpp")
 target_link_libraries(TDGLPhysicsSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME TDGLPhysicsSmokeTest COMMAND TDGLPhysicsSmokeTest)
+
+add_executable(DependencyFeaturesSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/DependencyFeaturesSmokeTest.cpp")
+target_link_libraries(DependencyFeaturesSmokeTest PRIVATE CppTDGL::cppTDGL)
+add_test(NAME DependencyFeaturesSmokeTest COMMAND DependencyFeaturesSmokeTest)
 
 add_executable(SolutionSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/SolutionSmokeTest.cpp")
 target_link_libraries(SolutionSmokeTest PRIVATE CppTDGL::cppTDGL)
