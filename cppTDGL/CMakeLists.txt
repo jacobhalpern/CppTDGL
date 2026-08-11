@@ -78,6 +78,7 @@ option(CPPTDGL_ENABLE_QT "Build optional Qt Widgets application shell" OFF)
 option(CPPTDGL_ENABLE_EIGEN "Enable optional Eigen integration hooks." OFF)
 option(CPPTDGL_ENABLE_NATIVE_HDF5 "Enable optional native HDF5 integration hooks." OFF)
 option(CPPTDGL_ENABLE_VTK "Enable optional VTK visualization integration hooks." OFF)
+option(CPPTDGL_ENABLE_PACKAGING "Enable CPack packaging configuration." OFF)
 
 if (CPPTDGL_ENABLE_QT)
     find_package(Qt6 REQUIRED COMPONENTS Widgets)
@@ -144,6 +145,10 @@ add_test(NAME TDGLPhysicsSmokeTest COMMAND TDGLPhysicsSmokeTest)
 add_executable(DependencyFeaturesSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/DependencyFeaturesSmokeTest.cpp")
 target_link_libraries(DependencyFeaturesSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME DependencyFeaturesSmokeTest COMMAND DependencyFeaturesSmokeTest)
+
+add_executable(PackagingInfoSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/PackagingInfoSmokeTest.cpp")
+target_link_libraries(PackagingInfoSmokeTest PRIVATE CppTDGL::cppTDGL)
+add_test(NAME PackagingInfoSmokeTest COMMAND PackagingInfoSmokeTest)
 
 add_executable(SolutionSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/SolutionSmokeTest.cpp")
 target_link_libraries(SolutionSmokeTest PRIVATE CppTDGL::cppTDGL)
@@ -214,3 +219,41 @@ add_test(NAME ProjectSerializerMeshIntegrationSmokeTest COMMAND ProjectSerialize
 add_executable(ProjectSerializerSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/io_tests/ProjectSerializerSmokeTest.cpp")
 target_link_libraries(ProjectSerializerSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME ProjectSerializerSmokeTest COMMAND ProjectSerializerSmokeTest)
+
+# ----------------------------------------------------------------------
+# Packaging and install scaffold
+# ----------------------------------------------------------------------
+
+install(TARGETS cppTDGL
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin
+)
+
+if (TARGET CppTDGLSmokeCli)
+    install(TARGETS CppTDGLSmokeCli
+        RUNTIME DESTINATION bin
+    )
+endif()
+
+if (TARGET CppTDGLQtApp)
+    install(TARGETS CppTDGLQtApp
+        RUNTIME DESTINATION bin
+    )
+endif()
+
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src/"
+    DESTINATION include/cppTDGL
+    FILES_MATCHING
+        PATTERN "*.hpp"
+)
+
+if (CPPTDGL_ENABLE_PACKAGING)
+    set(CPACK_PACKAGE_NAME "CppTDGL")
+    set(CPACK_PACKAGE_VENDOR "CppTDGL Project")
+    set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+    set(CPACK_PACKAGE_FILE_NAME "CppTDGL-${PROJECT_VERSION}")
+    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Native C++ TDGL simulation application scaffold")
+    set(CPACK_GENERATOR "ZIP;TGZ")
+    include(CPack)
+endif()
