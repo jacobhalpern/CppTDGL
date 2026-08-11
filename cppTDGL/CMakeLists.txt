@@ -154,6 +154,10 @@ add_executable(SolverSettingsModelSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/u
 target_link_libraries(SolverSettingsModelSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME SolverSettingsModelSmokeTest COMMAND SolverSettingsModelSmokeTest)
 
+add_executable(SimulationExecutionModelSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/ui_tests/SimulationExecutionModelSmokeTest.cpp")
+target_link_libraries(SimulationExecutionModelSmokeTest PRIVATE CppTDGL::cppTDGL)
+add_test(NAME SimulationExecutionModelSmokeTest COMMAND SimulationExecutionModelSmokeTest)
+
 add_executable(SerializationFormatSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/io_tests/SerializationFormatSmokeTest.cpp")
 target_link_libraries(SerializationFormatSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME SerializationFormatSmokeTest COMMAND SerializationFormatSmokeTest)
