@@ -108,6 +108,10 @@ add_executable(TDGLSolverSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests
 target_link_libraries(TDGLSolverSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME TDGLSolverSmokeTest COMMAND TDGLSolverSmokeTest)
 
+add_executable(TDGLPhysicsSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/TDGLPhysicsSmokeTest.cpp")
+target_link_libraries(TDGLPhysicsSmokeTest PRIVATE CppTDGL::cppTDGL)
+add_test(NAME TDGLPhysicsSmokeTest COMMAND TDGLPhysicsSmokeTest)
+
 add_executable(SolutionSmokeTest "${CMAKE_CURRENT_SOURCE_DIR}/tests/core_tests/SolutionSmokeTest.cpp")
 target_link_libraries(SolutionSmokeTest PRIVATE CppTDGL::cppTDGL)
 add_test(NAME SolutionSmokeTest COMMAND SolutionSmokeTest)
